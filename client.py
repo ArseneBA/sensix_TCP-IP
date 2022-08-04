@@ -218,10 +218,10 @@ if __name__ == '__main__':
     host_ip = 'localhost'
     host_port = 6000
     command = []
-    for i in range(15):
-        for j in range(10):
-            command.append([i, j])
-    # command = [array_dictionary["FGx"], array_dictionary["MGx"]]
+    # for i in range(15):
+    #     for j in range(10):
+    #         command.append([i, j])
+    command = [array_dictionary["FGx"], array_dictionary["MGx"]]
     client = Client(host_ip, host_port, "TCP")
     client._connect()
     i = 1
@@ -230,11 +230,13 @@ if __name__ == '__main__':
 
     while True:
         if i == 100:
-            print(i, round(time.time() - time_past, 6), time_read_tcp_ip/100)
+            print(round(time.time() - time_past, 6), time_read_tcp_ip/100)
             time_past = time.time()
             i = 0
             time_read_tcp_ip = 0
 
         data = client.get_data(command)
+        print(data)
         i += 1
         time_read_tcp_ip += client.time_total
+        time.sleep(2)
