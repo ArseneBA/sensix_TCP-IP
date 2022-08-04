@@ -6,6 +6,7 @@ import socket
 import struct
 import time
 from typing import Union
+import numpy as np
 
 Buff_size = 32767
 
@@ -164,7 +165,7 @@ class Client:
         data = struct.unpack('!d', data)[0]
         return data
 
-    def get_data(self, message: (Message, str) = Message(), buff: int = Buff_size):
+    def get_data(self, message, buff: int = Buff_size):
         """
         Get the data from server using the command.
 
@@ -184,10 +185,14 @@ class Client:
 
         # Send text in byte form
         b_message = b''
-
+        for i in range(np.shape(message)[0]):
+            for j in range(np.shape(message)[1]):
+                b_message += struct.pack('!B', message[i][j])
 
         # Send int in byte form
-        b_size = len(message).to_bytes(4, 'big')
+        # TODO: Change in order to correspond to an array
+        # we chose unsigned int 8 (range from 0 to 511) so each x or y coordinates can be store on 1 byte
+        b_size = struct.pack('!i', np.shape(message)[0] * np.shape(message)[1] * 1)
 
         # Send size of the message
         self.client.sendall(b_size)
@@ -197,7 +202,7 @@ class Client:
         return self._recv_all(buff)
 
 
-array_dictionary = {"FGx": [0, 0], "FGy": [0, 1], "FGz": [0, 2]}
+array_dictionary = {"FGx": [0, 0], "FGy": [0, 1], "FGz": [0, 2], "MGx": [2,0]}
 
 if __name__ == '__main__':
     # Set program variables
@@ -207,11 +212,13 @@ if __name__ == '__main__':
     # Run streaming data
     host_ip = 'localhost'
     host_port = 6000
-    command = [array_dictionary["FGy"]]
+    command = [array_dictionary["FGx"], array_dictionary["MGx"]]
     client = Client(host_ip, host_port, "TCP")
     client._connect()
+    i = 1
 
     while True:
+        print(i)
         data = client.get_data(command)
-        print(data)
-        time.sleep(0.5)
+        i += 1
+        time.sleep(2)
