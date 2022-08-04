@@ -114,6 +114,8 @@ class Client:
     def _connect(self):
         self.client.connect((self.server_address, self.port))
 
+        self.time_total = 0
+
     @staticmethod
     def client_sock(type: str,):
         """
@@ -157,12 +159,14 @@ class Client:
         data = b''
         l = 0
         while l < msg_len:
-            chunk = self.client.recv(4)
+            chunk = self.client.recv(buff_size)
             l += len(chunk)
             data += chunk
 
         # Unpack double in network standard (Big endian)
-        data = struct.unpack('!d', data)[0]
+        frmt = '!' + str(int(msg_len)) + 'd'
+        data = struct.unpack(frmt, data)
+        self.time_total = time.time() - self.time_total
         return data
 
     def get_data(self, message, buff: int = Buff_size):
@@ -180,6 +184,7 @@ class Client:
         data: dict
             Data from server.
         """
+        self.time_total = time.time()
         if isinstance(message, Message):
             message = message.__dict__
 
@@ -212,13 +217,24 @@ if __name__ == '__main__':
     # Run streaming data
     host_ip = 'localhost'
     host_port = 6000
-    command = [array_dictionary["FGx"], array_dictionary["MGx"]]
+    command = []
+    for i in range(15):
+        for j in range(10):
+            command.append([i, j])
+    # command = [array_dictionary["FGx"], array_dictionary["MGx"]]
     client = Client(host_ip, host_port, "TCP")
     client._connect()
     i = 1
+    time_past = time.time()
+    time_read_tcp_ip = 0
 
     while True:
-        print(i)
+        if i == 100:
+            print(i, round(time.time() - time_past, 6), time_read_tcp_ip/100)
+            time_past = time.time()
+            i = 0
+            time_read_tcp_ip = 0
+
         data = client.get_data(command)
         i += 1
-        time.sleep(2)
+        time_read_tcp_ip += client.time_total
