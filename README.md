@@ -50,7 +50,7 @@ Pour intégrer notre module TCP/IP au programme existant, il est nécessaire de:
 
 - Donner la matrice (ou sont type, c'est à dire une matrice de taille équivalente) des données générées à l'entrée de la création de la queue dans le VI "Server_LabView.vi", ce qui permet à la queue d'avoir le bon type de donnée qu'elle va stocker.
 
-  ![change_data_array_position](\image\change_data_array_position.png)
+  ![change_data_array_position](\image\change_data_array_position.png?raw=True)
 
 - Récupérer le "queue out", contenant le queue refnum et le type des données échangé avec la queue , et le "error in". Cette connexion entre le VI du programme de récolte de données et notre programme se fait dans le VI "Server_LabView.vi" en remplaçant le vi "data array refresh.vi" par le VI du programme.
 
